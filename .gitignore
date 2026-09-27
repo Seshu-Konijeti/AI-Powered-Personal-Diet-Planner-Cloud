@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/
+env/
+
+# Environment / secrets
+.env
+
+# Database
+*.db
+*.sqlite3
+
+# Simulated cloud storage bucket contents (keep the folder, ignore uploaded files)
+storage_bucket/*
+!storage_bucket/.gitkeep
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log

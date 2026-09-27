@@ -1,0 +1,79 @@
+{
+  "vegetarian": {
+    "breakfast": [
+      "Vegetable poha with peanuts and a glass of milk",
+      "Moong dal chilla with mint chutney and curd",
+      "Oats porridge with banana and chia seeds"
+    ],
+    "lunch": [
+      "Brown rice, mixed vegetable curry, dal, and cucumber salad",
+      "Chapati, paneer bhurji, and a bowl of salad",
+      "Vegetable pulao with raita and roasted papad"
+    ],
+    "snack": [
+      "Roasted chana with a cup of green tea",
+      "Fruit chaat (apple, papaya, pomegranate)",
+      "Sprout salad with lemon"
+    ],
+    "dinner": [
+      "Roti, palak paneer, and a small bowl of curd",
+      "Khichdi with ghee and a side of salad",
+      "Vegetable soup with multigrain toast"
+    ]
+  },
+  "vegan": {
+    "breakfast": [
+      "Vegetable upma with almond milk on the side",
+      "Overnight oats with soy milk, flax seeds, and berries",
+      "Besan chilla with tomato chutney"
+    ],
+    "lunch": [
+      "Brown rice, chana masala, and cucumber-tomato salad",
+      "Quinoa vegetable bowl with lemon-tahini dressing",
+      "Roti (no ghee) with mixed vegetable sabzi and salad"
+    ],
+    "snack": [
+      "Roasted peanuts and an apple",
+      "Hummus with carrot and cucumber sticks",
+      "Handful of mixed nuts and dates"
+    ],
+    "dinner": [
+      "Moong dal soup with multigrain toast",
+      "Stir-fried tofu with vegetables and brown rice",
+      "Vegetable khichdi (no ghee) with salad"
+    ]
+  },
+  "non_vegetarian": {
+    "breakfast": [
+      "Boiled eggs (2) with whole wheat toast and fruit",
+      "Egg bhurji with multigrain paratha",
+      "Greek yogurt with granola and boiled egg on the side"
+    ],
+    "lunch": [
+      "Grilled chicken breast, brown rice, and mixed vegetable salad",
+      "Fish curry with steamed rice and cucumber salad",
+      "Chicken and vegetable stir-fry with roti"
+    ],
+    "snack": [
+      "Boiled egg whites with black tea",
+      "Roasted chickpeas and a small handful of almonds",
+      "Grilled chicken strips (small portion) with salad"
+    ],
+    "dinner": [
+      "Grilled fish with steamed vegetables",
+      "Chicken soup with multigrain toast",
+      "Egg curry with one roti and salad"
+    ]
+  },
+  "goal_notes": {
+    "balanced": "Portions are kept moderate and varied to support general, everyday balanced eating.",
+    "weight_management": "Portions favour higher protein and fibre with controlled carbohydrate servings; this is a general demo pattern, not a clinical calorie-deficit plan.",
+    "fitness": "Portions favour higher protein to support an active/training routine; adjust quantities to your own training load."
+  },
+  "activity_calorie_estimate": {
+    "sedentary": 1800,
+    "light": 2000,
+    "moderate": 2200,
+    "active": 2500
+  }
+}

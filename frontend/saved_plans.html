@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Saved Plans | DietPlanner Cloud</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<nav>
+  <a class="brand" href="dashboard.html">🥗 DietPlanner Cloud</a>
+  <div class="links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="generate.html">Generate Plan</a>
+    <a href="files.html">Cloud Files</a>
+    <a href="#" id="logoutLink">Logout</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="card">
+    <h1>Saved Plans</h1>
+    <p class="subtitle">All plans stored for your account in the cloud database.</p>
+    <table id="plansTable" style="display:none;">
+      <thead><tr><th>Date</th><th>Source</th><th>Goal</th><th>Calories</th><th></th></tr></thead>
+      <tbody id="plansBody"></tbody>
+    </table>
+    <p id="emptyMsg" style="display:none; color:var(--muted);">No plans yet — generate your first one!</p>
+    <div id="msg" class="msg" style="display:none;"></div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuthOrRedirect();
+
+async function loadPlans() {
+  try {
+    const data = await apiRequest("/plans");
+    if (data.plans.length === 0) {
+      document.getElementById("emptyMsg").style.display = "block";
+      return;
+    }
+    document.getElementById("plansTable").style.display = "table";
+    document.getElementById("plansBody").innerHTML = data.plans
+      .map(
+        (p) => `<tr>
+          <td>${new Date(p.created_at).toLocaleDateString()}</td>
+          <td>${p.source}</td>
+          <td>${p.nutrition_summary.goal ?? "-"}</td>
+          <td>${p.nutrition_summary.estimated_daily_calories ?? "-"}</td>
+          <td>
+            <a href="result.html?id=${p.plan_id}">View</a> ·
+            <a href="#" onclick="deletePlan(${p.plan_id}); return false;" style="color:var(--danger);">Delete</a>
+          </td>
+        </tr>`
+      )
+      .join("");
+  } catch (err) {
+    showMessage("msg", err.message, "error");
+  }
+}
+
+async function deletePlan(id) {
+  if (!confirm("Delete this plan?")) return;
+  try {
+    await apiRequest(`/plans/${id}`, { method: "DELETE" });
+    loadPlans();
+  } catch (err) {
+    showMessage("msg", err.message, "error");
+  }
+}
+
+loadPlans();
+
+document.getElementById("logoutLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try { await apiRequest("/logout", { method: "POST" }); } catch (err) {}
+  clearSession();
+  window.location.href = "login.html";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Generate Diet Plan | DietPlanner Cloud</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<nav>
+  <a class="brand" href="dashboard.html">🥗 DietPlanner Cloud</a>
+  <div class="links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="profile.html">Profile</a>
+    <a href="saved_plans.html">Saved Plans</a>
+    <a href="files.html">Cloud Files</a>
+    <a href="#" id="logoutLink">Logout</a>
+  </div>
+</nav>
+
+<div class="container narrow">
+  <div class="card">
+    <h1>Generate a Diet Plan</h1>
+    <p class="subtitle">Leave a field blank to use the value already saved in your profile.</p>
+
+    <form id="genForm">
+      <label for="dietary_preference">Dietary preference</label>
+      <select id="dietary_preference">
+        <option value="">Use profile value</option>
+        <option value="vegetarian">Vegetarian</option>
+        <option value="vegan">Vegan</option>
+        <option value="non_vegetarian">Non-Vegetarian</option>
+      </select>
+
+      <label for="activity_level">Activity level</label>
+      <select id="activity_level">
+        <option value="">Use profile value</option>
+        <option value="sedentary">Sedentary</option>
+        <option value="light">Light</option>
+        <option value="moderate">Moderate</option>
+        <option value="active">Active</option>
+      </select>
+
+      <label for="goal">Goal</label>
+      <select id="goal">
+        <option value="">Use profile value</option>
+        <option value="balanced">General balanced eating</option>
+        <option value="weight_management">Weight-management (demo)</option>
+        <option value="fitness">Fitness-oriented (demo)</option>
+      </select>
+
+      <button type="submit">Generate Plan</button>
+    </form>
+    <div id="msg" class="msg" style="display:none;"></div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuthOrRedirect();
+
+document.getElementById("genForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const payload = {};
+  ["dietary_preference", "activity_level", "goal"].forEach((id) => {
+    const val = document.getElementById(id).value;
+    if (val) payload[id] = val;
+  });
+
+  try {
+    const data = await apiRequest("/generate-plan", { method: "POST", body: payload });
+    window.location.href = `result.html?id=${data.plan.plan_id}`;
+  } catch (err) {
+    showMessage("msg", err.message, "error");
+  }
+});
+
+document.getElementById("logoutLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try { await apiRequest("/logout", { method: "POST" }); } catch (err) {}
+  clearSession();
+  window.location.href = "login.html";
+});
+</script>
+</body>
+</html>

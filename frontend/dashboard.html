@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard | DietPlanner Cloud</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<nav>
+  <a class="brand" href="dashboard.html">🥗 DietPlanner Cloud</a>
+  <div class="links">
+    <a href="profile.html">Profile</a>
+    <a href="generate.html">Generate Plan</a>
+    <a href="saved_plans.html">Saved Plans</a>
+    <a href="files.html">Cloud Files</a>
+    <a href="#" id="logoutLink">Logout</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="card">
+    <h1 id="welcomeMsg">Welcome</h1>
+    <div class="grid-2">
+      <div>
+        <p><strong>Current goal:</strong> <span id="goalVal">-</span></p>
+        <p><strong>Diet preference:</strong> <span id="prefVal">-</span></p>
+      </div>
+      <div style="text-align:right;">
+        <a class="btn" href="generate.html">Generate New Plan</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Latest Plan</h2>
+    <div id="latestPlan"><p style="color:var(--muted);">No plans yet.</p></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h2>Previous Plans</h2>
+      <p id="plansCount" style="color:var(--muted);">0 saved plans.</p>
+      <a class="btn secondary" href="saved_plans.html">View All Plans</a>
+    </div>
+    <div class="card">
+      <h2>Uploaded Files</h2>
+      <p id="filesCount" style="color:var(--muted);">0 files in cloud storage.</p>
+      <a class="btn secondary" href="files.html">Manage Files</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuthOrRedirect();
+
+async function loadDashboard() {
+  try {
+    const user = await apiRequest("/profile");
+    setCurrentUser(user);
+    document.getElementById("welcomeMsg").textContent = `Welcome, ${user.name}`;
+    document.getElementById("goalVal").textContent = user.goal || "Not set — visit Profile";
+    document.getElementById("prefVal").textContent = user.dietary_preference || "Not set — visit Profile";
+
+    const plansData = await apiRequest("/plans");
+    document.getElementById("plansCount").textContent = `${plansData.plans.length} saved plan(s).`;
+    if (plansData.plans.length > 0) {
+      const latest = plansData.plans[0];
+      document.getElementById("latestPlan").innerHTML = `
+        <div class="meal-grid">
+          <div class="meal-box"><h3>Breakfast</h3><p>${latest.breakfast}</p></div>
+          <div class="meal-box"><h3>Lunch</h3><p>${latest.lunch}</p></div>
+          <div class="meal-box"><h3>Snack</h3><p>${latest.snack}</p></div>
+          <div class="meal-box"><h3>Dinner</h3><p>${latest.dinner}</p></div>
+        </div>
+        <a class="btn secondary" href="result.html?id=${latest.plan_id}" style="margin-top:14px;">View Full Plan</a>
+      `;
+    }
+
+    const filesData = await apiRequest("/files");
+    document.getElementById("filesCount").textContent = `${filesData.files.length} file(s) stored.`;
+  } catch (err) {
+    console.error(err);
+  }
+}
+loadDashboard();
+
+document.getElementById("logoutLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try { await apiRequest("/logout", { method: "POST" }); } catch (err) {}
+  clearSession();
+  window.location.href = "login.html";
+});
+</script>
+</body>
+</html>

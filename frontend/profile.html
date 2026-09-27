@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Profile | DietPlanner Cloud</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<nav>
+  <a class="brand" href="dashboard.html">🥗 DietPlanner Cloud</a>
+  <div class="links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="generate.html">Generate Plan</a>
+    <a href="saved_plans.html">Saved Plans</a>
+    <a href="files.html">Cloud Files</a>
+    <a href="#" id="logoutLink">Logout</a>
+  </div>
+</nav>
+
+<div class="container narrow">
+  <div class="card">
+    <h1>My Profile</h1>
+    <p class="subtitle">These demo fields personalize your AI-generated diet plan.</p>
+
+    <form id="profileForm">
+      <label for="age">Age</label>
+      <input type="number" id="age" min="10" max="100" />
+
+      <label for="height_cm">Height (cm)</label>
+      <input type="number" id="height_cm" min="100" max="250" />
+
+      <label for="weight_kg">Weight (kg)</label>
+      <input type="number" id="weight_kg" min="25" max="250" />
+
+      <label for="activity_level">Activity level</label>
+      <select id="activity_level">
+        <option value="sedentary">Sedentary</option>
+        <option value="light">Light</option>
+        <option value="moderate">Moderate</option>
+        <option value="active">Active</option>
+      </select>
+
+      <label for="dietary_preference">Dietary preference</label>
+      <select id="dietary_preference">
+        <option value="vegetarian">Vegetarian</option>
+        <option value="vegan">Vegan</option>
+        <option value="non_vegetarian">Non-Vegetarian</option>
+      </select>
+
+      <label for="goal">Goal</label>
+      <select id="goal">
+        <option value="balanced">General balanced eating</option>
+        <option value="weight_management">Weight-management (demo)</option>
+        <option value="fitness">Fitness-oriented (demo)</option>
+      </select>
+
+      <label for="allergies">Allergies / preferences (optional)</label>
+      <input type="text" id="allergies" placeholder="e.g. peanuts, gluten" />
+
+      <button type="submit">Save Profile</button>
+    </form>
+    <div id="msg" class="msg" style="display:none;"></div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuthOrRedirect();
+
+async function loadProfile() {
+  try {
+    const user = await apiRequest("/profile");
+    setCurrentUser(user);
+    ["age", "height_cm", "weight_kg", "activity_level", "dietary_preference", "goal", "allergies"]
+      .forEach((field) => {
+        if (user[field] !== null && user[field] !== undefined) {
+          document.getElementById(field).value = user[field];
+        }
+      });
+  } catch (err) {
+    showMessage("msg", err.message, "error");
+  }
+}
+loadProfile();
+
+document.getElementById("profileForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const payload = {
+    age: Number(document.getElementById("age").value) || null,
+    height_cm: Number(document.getElementById("height_cm").value) || null,
+    weight_kg: Number(document.getElementById("weight_kg").value) || null,
+    activity_level: document.getElementById("activity_level").value,
+    dietary_preference: document.getElementById("dietary_preference").value,
+    goal: document.getElementById("goal").value,
+    allergies: document.getElementById("allergies").value.trim(),
+  };
+  try {
+    const data = await apiRequest("/profile", { method: "PUT", body: payload });
+    setCurrentUser(data.user);
+    showMessage("msg", "Profile saved.", "success");
+  } catch (err) {
+    showMessage("msg", err.message, "error");
+  }
+});
+
+document.getElementById("logoutLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try { await apiRequest("/logout", { method: "POST" }); } catch (err) {}
+  clearSession();
+  window.location.href = "login.html";
+});
+</script>
+</body>
+</html>

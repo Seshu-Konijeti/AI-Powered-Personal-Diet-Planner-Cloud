@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Diet Plan | DietPlanner Cloud</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<nav>
+  <a class="brand" href="dashboard.html">🥗 DietPlanner Cloud</a>
+  <div class="links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="generate.html">Generate Plan</a>
+    <a href="saved_plans.html">Saved Plans</a>
+    <a href="files.html">Cloud Files</a>
+    <a href="#" id="logoutLink">Logout</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="card">
+    <h1>Your Diet Plan</h1>
+    <p class="subtitle" id="metaLine">Loading...</p>
+
+    <div class="meal-grid" id="mealGrid"></div>
+
+    <div class="card" style="margin-top:20px; background:#f9fbfa;">
+      <h2>Nutrition Summary</h2>
+      <div id="nutrition"></div>
+      <p id="hydration" style="color:var(--muted); margin-top:10px;"></p>
+    </div>
+
+    <div class="disclaimer" id="disclaimer"></div>
+    <a class="btn secondary" href="saved_plans.html">Back to Saved Plans</a>
+    <a class="btn" href="generate.html">Generate Another</a>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuthOrRedirect();
+
+const params = new URLSearchParams(window.location.search);
+const planId = params.get("id");
+
+async function loadPlan() {
+  if (!planId) {
+    document.getElementById("metaLine").textContent = "No plan specified.";
+    return;
+  }
+  try {
+    const plan = await apiRequest(`/plans/${planId}`);
+    document.getElementById("metaLine").textContent =
+      `Generated ${new Date(plan.created_at).toLocaleString()} · source: ${plan.source}`;
+
+    const meals = [
+      ["Breakfast", plan.breakfast],
+      ["Lunch", plan.lunch],
+      ["Snack", plan.snack],
+      ["Dinner", plan.dinner],
+    ];
+    document.getElementById("mealGrid").innerHTML = meals
+      .map(([label, text]) => `<div class="meal-box"><h3>${label}</h3><p>${text}</p></div>`)
+      .join("");
+
+    const n = plan.nutrition_summary;
+    document.getElementById("nutrition").innerHTML = `
+      <p><strong>Estimated daily calories:</strong> ${n.estimated_daily_calories ?? "N/A"}</p>
+      <p><strong>Preference:</strong> ${n.dietary_preference ?? "-"} &nbsp;|&nbsp; <strong>Goal:</strong> ${n.goal ?? "-"}</p>
+      <p>${n.goal_note ?? ""}</p>
+    `;
+    document.getElementById("hydration").textContent = "💧 " + (plan.hydration_reminder || "");
+    document.getElementById("disclaimer").textContent = plan.disclaimer;
+  } catch (err) {
+    document.getElementById("metaLine").textContent = err.message;
+  }
+}
+loadPlan();
+
+document.getElementById("logoutLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try { await apiRequest("/logout", { method: "POST" }); } catch (err) {}
+  clearSession();
+  window.location.href = "login.html";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cloud Files | DietPlanner Cloud</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<nav>
+  <a class="brand" href="dashboard.html">🥗 DietPlanner Cloud</a>
+  <div class="links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="generate.html">Generate Plan</a>
+    <a href="saved_plans.html">Saved Plans</a>
+    <a href="#" id="logoutLink">Logout</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="card">
+    <h1>Cloud Files</h1>
+    <p class="subtitle">Upload optional demo meal/food images. Files are stored in the cloud object storage layer (separate from the database).</p>
+
+    <form id="uploadForm">
+      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.gif,.pdf,.txt" required />
+      <button type="submit">Upload</button>
+    </form>
+    <div id="uploadMsg" class="msg" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <h2>Your Files</h2>
+    <table id="filesTable" style="display:none;">
+      <thead><tr><th>Filename</th><th>Type</th><th>Size</th><th>Uploaded</th><th></th></tr></thead>
+      <tbody id="filesBody"></tbody>
+    </table>
+    <p id="emptyMsg" style="display:none; color:var(--muted);">No files uploaded yet.</p>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+requireAuthOrRedirect();
+
+function formatSize(bytes) {
+  if (!bytes) return "-";
+  if (bytes < 1024) return bytes + " B";
+  return (bytes / 1024).toFixed(1) + " KB";
+}
+
+async function loadFiles() {
+  try {
+    const data = await apiRequest("/files");
+    if (data.files.length === 0) {
+      document.getElementById("emptyMsg").style.display = "block";
+      document.getElementById("filesTable").style.display = "none";
+      return;
+    }
+    document.getElementById("emptyMsg").style.display = "none";
+    document.getElementById("filesTable").style.display = "table";
+    document.getElementById("filesBody").innerHTML = data.files
+      .map(
+        (f) => `<tr>
+          <td>${f.filename}</td>
+          <td>${f.content_type || "-"}</td>
+          <td>${formatSize(f.size_bytes)}</td>
+          <td>${new Date(f.uploaded_at).toLocaleString()}</td>
+          <td><a href="#" onclick="deleteFile(${f.file_id}); return false;" style="color:var(--danger);">Delete</a></td>
+        </tr>`
+      )
+      .join("");
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function deleteFile(id) {
+  if (!confirm("Delete this file?")) return;
+  try {
+    await apiRequest(`/files/${id}`, { method: "DELETE" });
+    loadFiles();
+  } catch (err) {
+    showMessage("uploadMsg", err.message, "error");
+  }
+}
+
+document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const fileInput = document.getElementById("fileInput");
+  if (!fileInput.files.length) return;
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  try {
+    await apiRequest("/upload", { method: "POST", body: formData, isForm: true });
+    showMessage("uploadMsg", "File uploaded to cloud storage.", "success");
+    fileInput.value = "";
+    loadFiles();
+  } catch (err) {
+    showMessage("uploadMsg", err.message, "error");
+  }
+});
+
+loadFiles();
+
+document.getElementById("logoutLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try { await apiRequest("/logout", { method: "POST" }); } catch (err) {}
+  clearSession();
+  window.location.href = "login.html";
+});
+</script>
+</body>
+</html>
