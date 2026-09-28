@@ -1,5 +1,5 @@
 # AI-Powered Personal Diet Planner with Cloud Storage
-
+**Live demo:** https://ai-diet-planner-cloud.netlify.app (free-tier hosting: the first load can take about a minute while the backend wakes up)
 > Educational Cloud Computing course project. Uses synthetic/demo data only. Generated diet
 > plans are general wellness examples, **not medical or clinical nutrition advice**.
 
