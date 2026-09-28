@@ -38,9 +38,14 @@
 <script>
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const button = e.target.querySelector("button[type=submit]");
   const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
+
+  button.disabled = true;
+  button.textContent = "Please wait...";
+  showMessage("msg", "Contacting server. On the free tier the first request can take up to a minute. Please don't click again.", "success");
 
   try {
     await apiRequest("/register", { method: "POST", body: { name, email, password } });
@@ -48,6 +53,8 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     setTimeout(() => (window.location.href = "login.html"), 1200);
   } catch (err) {
     showMessage("msg", err.message, "error");
+    button.disabled = false;
+    button.textContent = "Register";
   }
 });
 </script>
