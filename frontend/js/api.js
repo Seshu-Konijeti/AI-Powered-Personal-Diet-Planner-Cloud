@@ -3,7 +3,10 @@
  * Talks to the Flask REST API (backend/app.py). Update API_BASE when you
  * deploy the backend to the cloud (Render/Railway/EC2/etc.).
  */
-const API_BASE = window.API_BASE_OVERRIDE || "http://localhost:5000";
+const API_BASE = window.API_BASE_OVERRIDE ||
+  ((location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:5000"
+    : "https://YOUR-RENDER-URL.onrender.com");
 
 function getToken() {
   return localStorage.getItem("access_token");
