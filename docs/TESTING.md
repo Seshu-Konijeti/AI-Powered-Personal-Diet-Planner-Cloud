@@ -30,7 +30,7 @@ pytest tests/ -v
 | TC-17 | Invalid file type | `.exe` file | 400, rejected | 400 returned | Pass |
 | TC-18 | User A cannot retrieve User B's data | User B requests User A's `plan_id` | 404 (not leaked) | 404 returned | Pass |
 | TC-19 | Logout | `POST /logout` then reuse token | Token revoked, subsequent request 401 | 401 returned | Pass |
-| TC-20 | Cloud/database failure handling | DB unreachable (simulated) | 500 handled gracefully via `errorhandler(500)`, no stack trace leaked | Manual test — see note below | Pass |
+| TC-20 | Cloud/database failure handling | DB unreachable (simulated) | 500 handled gracefully via `errorhandler(500)`, no stack trace leaked | Not tested | Not tested |
 
 > TC-20 is exercised manually (temporarily point `DATABASE_URL` at an unreachable host and
 > confirm the API returns a clean 500 JSON error instead of crashing) since simulating a live

@@ -5,7 +5,7 @@
 - Built and deployed a full-stack AI-powered diet planning app with JWT authentication, a
   cloud database, and cloud object storage, enforcing per-user data isolation across 10+ REST endpoints.
 - Designed a rule-based AI recommendation engine with an optional external-API mode and
-  automatic fallback logic, ensuring 100% uptime for core functionality without paid dependencies.
+  automatic fallback logic, so plan generation still works when the API is unavailable or unconfigured.
 - Wrote a 15-case automated test suite (pytest) covering auth, authorization, data isolation,
   and AI-fallback behavior, and set up a GitHub Actions CI pipeline to run it on every push.
 
